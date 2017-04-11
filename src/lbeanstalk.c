@@ -15,10 +15,6 @@ LUALIB_API int lbeanstalk_status_text(lua_State *L) {
   return 1;
 }
 
-void lbeanstalk_push_status_map(lua_State *L) {
-
-}
-
 void lbeanstalk_push_job(lua_State *L, lbeanstalk_client *client, BSJ *job) {
   lbeanstalk_job *j = (lbeanstalk_job *) lua_newuserdata(L, sizeof(lbeanstalk_job));
   j->job = job;
@@ -44,15 +40,15 @@ LUALIB_API int lbeanstalk_job_free(lua_State *L) {
 
 LUALIB_API int lbeanstalk_job_index(lua_State* L) {
   lbeanstalk_job *self = lbeanstalk_job_check(L, 1);
-	const char* key = luaL_checkstring(L, 2);
-	lua_getmetatable(L, 1);
-	lua_getfield(L, -1, key);
+  const char* key = luaL_checkstring(L, 2);
+  lua_getmetatable(L, 1);
+  lua_getfield(L, -1, key);
   /* return if the key present in the metatable */
-	if(!lua_isnil(L, -1)) {
+  if(!lua_isnil(L, -1)) {
     return 1;
   }
 
-	lua_settop(L, 2);
+  lua_settop(L, 2);
   if(strcmp(key, "id") == 0) {
     lua_pushinteger(L, self->job->id);
     return 1;
@@ -61,7 +57,7 @@ LUALIB_API int lbeanstalk_job_index(lua_State* L) {
     lua_pushlstring(L, self->job->data, self->job->size);
     return 1;
   }
-	return 0;
+  return 0;
 }
 
 LUALIB_API int lbeanstalk_job_delete(lua_State *L) {
@@ -70,7 +66,7 @@ LUALIB_API int lbeanstalk_job_delete(lua_State *L) {
   lua_pushboolean(L, ret == BS_STATUS_OK);
   lua_pushinteger(L, ret);
   return 2;
-}  
+}
 
 LUALIB_API int lbeanstalk_job_release(lua_State *L) {
   lbeanstalk_job *self = lbeanstalk_job_check(L, 1);
@@ -79,7 +75,7 @@ LUALIB_API int lbeanstalk_job_release(lua_State *L) {
   uint32_t delay = luaL_optint(L, 3, 0);
   int ret = bs_release(self->client->fd, self->job->id, priority, delay);
   lua_pushboolean(L, ret == BS_STATUS_OK);
-  lua_pushinteger(L, ret);  
+  lua_pushinteger(L, ret);
   return 2;
 }
 
@@ -89,7 +85,7 @@ LUALIB_API int lbeanstalk_job_bury(lua_State *L) {
   uint32_t priority = luaL_optint(L, 2, 0);
   int ret = bs_bury(self->client->fd, self->job->id, priority);
   lua_pushboolean(L, ret == BS_STATUS_OK);
-  lua_pushinteger(L, ret);  
+  lua_pushinteger(L, ret);
   return 2;
 }
 
@@ -97,7 +93,7 @@ LUALIB_API int lbeanstalk_job_touch(lua_State *L) {
   lbeanstalk_job *self = lbeanstalk_job_check(L, 1);
   int ret = bs_touch(self->client->fd, self->job->id);
   lua_pushboolean(L, ret == BS_STATUS_OK);
-  lua_pushinteger(L, ret);  
+  lua_pushinteger(L, ret);
   return 2;
 }
 
@@ -137,10 +133,10 @@ LUALIB_API int lbeanstalk_client_new(lua_State *L) {
 
 LUALIB_API int lbeanstalk_client_index(lua_State* L) {
   lbeanstalk_client *self = lbeanstalk_client_check(L, 1);
-	const char* key = luaL_checkstring(L, 2);
-	lua_getmetatable(L, 1);
-	lua_getfield(L, -1, key);
-	if(!lua_isnil(L, -1)) {
+  const char* key = luaL_checkstring(L, 2);
+  lua_getmetatable(L, 1);
+  lua_getfield(L, -1, key);
+  if(!lua_isnil(L, -1)) {
     return 1;
   }
 
@@ -228,7 +224,7 @@ LUALIB_API int lbeanstalk_client_reserve(lua_State *L) {
 LUALIB_API int lbeanstalk_client_peek(lua_State *L) {
   lbeanstalk_client *self = lbeanstalk_client_check(L, 1);
   int64_t id = luaL_checkint(L, 2);
-  BSJ *job;  
+  BSJ *job;
   int ret = bs_peek(self->fd, id, &job);
   lua_pushboolean(L, ret == BS_STATUS_OK);
   if(ret == BS_STATUS_OK) {
@@ -242,7 +238,7 @@ LUALIB_API int lbeanstalk_client_peek(lua_State *L) {
 
 LUALIB_API int lbeanstalk_client_peek_ready(lua_State *L) {
   lbeanstalk_client *self = lbeanstalk_client_check(L, 1);
-  BSJ *job;  
+  BSJ *job;
   int ret = bs_peek_ready(self->fd, &job);
   lua_pushboolean(L, ret == BS_STATUS_OK);
   if(ret == BS_STATUS_OK) {
@@ -256,7 +252,7 @@ LUALIB_API int lbeanstalk_client_peek_ready(lua_State *L) {
 
 LUALIB_API int lbeanstalk_client_peek_delayed(lua_State *L) {
   lbeanstalk_client *self = lbeanstalk_client_check(L, 1);
-  BSJ *job;  
+  BSJ *job;
   int ret = bs_peek_delayed(self->fd, &job);
   lua_pushboolean(L, ret == BS_STATUS_OK);
   if(ret == BS_STATUS_OK) {
@@ -270,7 +266,7 @@ LUALIB_API int lbeanstalk_client_peek_delayed(lua_State *L) {
 
 LUALIB_API int lbeanstalk_client_peek_buried(lua_State *L) {
   lbeanstalk_client *self = lbeanstalk_client_check(L, 1);
-  BSJ *job;  
+  BSJ *job;
   int ret = bs_peek_buried(self->fd, &job);
   lua_pushboolean(L, ret == BS_STATUS_OK);
   if(ret == BS_STATUS_OK) {
@@ -353,8 +349,6 @@ LUALIB_API int lbeanstalk_client_stats_tube(lua_State *L) {
   free(yaml);
   return 2;
 }
-
-
 
 LUALIB_API int luaopen_beanstalk(lua_State *L) {
   lua_newtable(L);
